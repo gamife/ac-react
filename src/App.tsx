@@ -1,12 +1,8 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import Card from "./components/Card";
 import { Button, Divider } from "antd";
 import useSWR, { SWRConfig, useSWRConfig, type SWRConfiguration } from "swr";
-import { responsiveArray } from "antd/es/_util/responsiveObserver";
-import { useImmerReducer } from "use-immer";
 
 import { FaBeer } from "react-icons/fa";
 import AcControl from "./components/AcControl";

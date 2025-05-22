@@ -1,119 +1,113 @@
 import "./index.css";
 
-import { useImmerReducer } from "use-immer";
-import {
-    Button,
-    Divider,
-    Flex,
-    Grid,
-    Slider,
-    type SliderSingleProps,
-} from "antd";
-import { createContext, useContext } from "react";
+import { Button, Flex, Slider, Switch, type SliderSingleProps } from "antd";
+import { AcProvider, useAc, useAcDispatch } from "./context";
 
-type AcControl = {
+export type AcControl = {
     isOn: boolean;
     temp: number;
 };
-type AcControlPartial = Partial<AcControl>;
+// type AcControlPartial = Partial<AcControl>;
+// type AcReducerAction = AcControlPartial & { type: "power" | "temp" };
 
-type AcReducerAction = AcControlPartial & { type: "power" | "temp" };
-function AcReducer(draft: AcControl, action: AcReducerAction) {
-    // 更新AcControl
-    (Object.keys(draft) as (keyof AcControl)[]).forEach((key) => {
-        const value = action[key];
-        if (value !== undefined) {
-            (draft[key] as AcControl[typeof key]) = value;
-        }
-    });
-    switch (action.type) {
-        case "power":
-
-        case "temp":
-    }
-}
-
-function Temp({ temp }: { temp: number }) {
+function Temp() {
+    const ac = useAc();
+    const dispatch = useAcDispatch();
+    const maxTemp = 28;
+    const minTemp = 16;
     const marks: SliderSingleProps["marks"] = {
         16: "16°C",
         22: "22°C",
         26: "26°C",
         28: "28°C",
     };
-
+    const tempDisplayStyle = {
+        color: "rgba(255, 102, 0, 1)",
+        fontSize: "3rem",
+        fontWeight: 700,
+        textShadow: "2px 2px 6px rgba(0,0,0,0.2)",
+    };
+    function onChange(updater: React.SetStateAction<number>) {
+        dispatch({
+            type: "temp",
+            temp: updater,
+        });
+    }
     return (
         <>
             <div>
-                <h1
-                    style={{
-                        textAlign: "center",
-                        color: "rgba(255, 102, 0, 1)",
-                        fontSize: "3rem",
-                        fontWeight: 700,
-                        textShadow: "2px 2px 6px rgba(0,0,0,0.2)",
-                    }}
-                >
-                    {temp} °C
-                </h1>
+                <h1 style={{ ...tempDisplayStyle }}>{ac.temp} °C</h1>
             </div>
-            <Flex wrap gap="middle" align="start" justify="space-evenly">
-                <Button type="primary">-</Button>
+            <Flex wrap gap="middle" align="" justify="space-evenly">
+                <Button
+                    type="primary"
+                    onClick={() =>
+                        onChange((temp) =>
+                            temp - 1 < minTemp ? minTemp : temp - 1
+                        )
+                    }
+                >
+                    -
+                </Button>
                 <Slider
                     marks={marks}
                     step={1}
-                    defaultValue={temp}
+                    defaultValue={26}
+                    value={ac.temp}
                     min={16}
                     max={28}
                     style={{ flex: 3 }}
+                    onChange={(v) => onChange(v)}
+                    // Todo: 只有滑动结束后才触发请求
+                    onChangeComplete={(v) => onChange(v)}
                 />
-                <Button type="primary">+</Button>
+                <Button
+                    type="primary"
+                    onClick={() =>
+                        onChange((temp) =>
+                            temp + 1 > maxTemp ? maxTemp : temp + 1
+                        )
+                    }
+                >
+                    +
+                </Button>
             </Flex>
         </>
     );
 }
-function Power() {
+// function Power() {
+//     const ac = useAc();
+//     const dispatch = useAcDispatch();
+
+//     return (
+//         <>
+//             <Button
+//                 variant="solid"
+//                 style={{ inlineSize: "50%" }}
+//                 color={ac.isOn ? "green" : "red"}
+//                 onClick={() => dispatch({ type: "power", isOn: !ac.isOn })}
+//             >
+//                 {ac.isOn ? "开" : "关"}
+//             </Button>
+//         </>
+//     );
+// }
+function Power2() {
     const ac = useAc();
     const dispatch = useAcDispatch();
 
     return (
         <>
-            <Button
-                // type="primary"
-                variant="solid"
-                style={{ inlineSize: "50%" }}
-                color={!ac.isOn ? "green" : "red"}
-                onClick={() => dispatch({ type: "power", isOn: !ac.isOn })}
-            >
-                {ac.isOn ? "开" : "关"}
-            </Button>
+            <Switch
+                checkedChildren="开启"
+                unCheckedChildren="关闭"
+                className="big-switch"
+                checked={ac.isOn}
+                onChange={(checked) =>
+                    dispatch({ type: "power", isOn: checked })
+                }
+            />
         </>
-    );
-}
-
-export const AcContext = createContext<AcControl | null>(null);
-export const AcDispatchContext =
-    createContext<React.Dispatch<AcReducerAction> | null>(null);
-
-export function useAc() {
-    return useContext(AcContext)!;
-}
-
-export function useAcDispatch() {
-    return useContext(AcDispatchContext)!;
-}
-
-export function AcProvider({ children }: { children: React.ReactNode }) {
-    // todo: 默认配置从浏览器storage中读取
-    const [ac, dispatch] = useImmerReducer(AcReducer, {
-        isOn: false,
-        temp: 20,
-    });
-    return (
-        <AcContext.Provider value={ac}>
-            <AcDispatchContext.Provider value={dispatch}>
-                {children}
-            </AcDispatchContext.Provider>
-        </AcContext.Provider>
     );
 }
 
@@ -121,7 +115,21 @@ export default function AcControl() {
     return (
         <>
             <AcProvider>
-                <Power></Power>
+                <Flex
+                    vertical
+                    gap="middle"
+                    // align="center"
+                    // justify="space-evenly"
+                    // wrap
+                >
+                    <Temp></Temp>
+                    {/* <div> */}
+                    {/* <Power></Power> */}
+                    {/* </div> */}
+                    <div>
+                        <Power2></Power2>
+                    </div>
+                </Flex>
             </AcProvider>
             {/* <Temp temp={ac.temp}></Temp>
                     <Power isOn={ac.isOn}></Power>
