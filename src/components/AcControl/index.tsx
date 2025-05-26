@@ -4,12 +4,19 @@ import {
     Button,
     ConfigProvider,
     Flex,
+    Radio,
     Slider,
     Switch,
+    Tooltip,
     type SliderSingleProps,
 } from "antd";
 import { AcProvider, useAc, useAcDispatch } from "./context";
 import { AiOutlineCaretDown, AiOutlineCaretUp } from "react-icons/ai";
+import {
+    WiWindBeaufort1,
+    WiWindBeaufort2,
+    WiWindBeaufort3,
+} from "react-icons/wi";
 
 export type AcControl = {
     isOn: boolean;
@@ -18,6 +25,36 @@ export type AcControl = {
 // type AcControlPartial = Partial<AcControl>;
 // type AcReducerAction = AcControlPartial & { type: "power" | "temp" };
 
+function WindSpeed() {
+    const buttonStyle = {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    };
+    const iconStyle = { fontSize: "2rem", verticalAlign: "middle" };
+
+    return (
+        <>
+            <Radio.Group
+                block
+                defaultValue="auto"
+                optionType="button"
+                buttonStyle="solid"
+            >
+                <Radio.Button value="auto">自动风</Radio.Button>
+                <Radio.Button value="1" style={buttonStyle}>
+                    <WiWindBeaufort1 style={iconStyle} />
+                </Radio.Button>
+                <Radio.Button value="2" style={buttonStyle}>
+                    <WiWindBeaufort2 style={iconStyle} />
+                </Radio.Button>
+                <Radio.Button value="3" style={buttonStyle}>
+                    <WiWindBeaufort3 style={iconStyle} />
+                </Radio.Button>
+            </Radio.Group>
+        </>
+    );
+}
 function Temp() {
     const ac = useAc();
     const dispatch = useAcDispatch();
@@ -46,7 +83,7 @@ function Temp() {
             <div>
                 <h1 style={{ ...tempDisplayStyle }}>{ac.temp} °C</h1>
             </div>
-            <Flex wrap gap="middle" align="" justify="space-evenly">
+            <Flex wrap gap="middle" align="center" justify="space-evenly">
                 <Button
                     type="primary"
                     onClick={() =>
@@ -105,15 +142,17 @@ function Power() {
                     },
                 }}
             >
-                <Switch
-                    checkedChildren="开启"
-                    unCheckedChildren="关闭"
-                    className="big-switch"
-                    checked={ac.isOn}
-                    onChange={(checked) =>
-                        dispatch({ type: "power", isOn: checked })
-                    }
-                />
+                <Tooltip title="电源开关">
+                    <Switch
+                        checkedChildren="开启"
+                        unCheckedChildren="关闭"
+                        className="big-switch"
+                        checked={ac.isOn}
+                        onChange={(checked) =>
+                            dispatch({ type: "power", isOn: checked })
+                        }
+                    />
+                </Tooltip>
             </ConfigProvider>
         </>
     );
@@ -125,6 +164,7 @@ export default function AcControl() {
             <AcProvider>
                 <Flex vertical gap="middle">
                     <Temp></Temp>
+                    <WindSpeed></WindSpeed>
                     <div>
                         <Power></Power>
                     </div>
