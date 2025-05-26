@@ -1,7 +1,15 @@
 import "./index.css";
 
-import { Button, Flex, Slider, Switch, type SliderSingleProps } from "antd";
+import {
+    Button,
+    ConfigProvider,
+    Flex,
+    Slider,
+    Switch,
+    type SliderSingleProps,
+} from "antd";
 import { AcProvider, useAc, useAcDispatch } from "./context";
+import { AiOutlineCaretDown, AiOutlineCaretUp } from "react-icons/ai";
 
 export type AcControl = {
     isOn: boolean;
@@ -22,7 +30,7 @@ function Temp() {
         28: "28°C",
     };
     const tempDisplayStyle = {
-        color: "rgba(255, 102, 0, 1)",
+        color: "rgb(5, 180, 90)",
         fontSize: "3rem",
         fontWeight: 700,
         textShadow: "2px 2px 6px rgba(0,0,0,0.2)",
@@ -47,7 +55,7 @@ function Temp() {
                         )
                     }
                 >
-                    -
+                    <AiOutlineCaretDown />
                 </Button>
                 <Slider
                     marks={marks}
@@ -69,44 +77,44 @@ function Temp() {
                         )
                     }
                 >
-                    +
+                    <AiOutlineCaretUp />
                 </Button>
             </Flex>
         </>
     );
 }
-// function Power() {
-//     const ac = useAc();
-//     const dispatch = useAcDispatch();
 
-//     return (
-//         <>
-//             <Button
-//                 variant="solid"
-//                 style={{ inlineSize: "50%" }}
-//                 color={ac.isOn ? "green" : "red"}
-//                 onClick={() => dispatch({ type: "power", isOn: !ac.isOn })}
-//             >
-//                 {ac.isOn ? "开" : "关"}
-//             </Button>
-//         </>
-//     );
-// }
-function Power2() {
+function Power() {
     const ac = useAc();
     const dispatch = useAcDispatch();
 
     return (
         <>
-            <Switch
-                checkedChildren="开启"
-                unCheckedChildren="关闭"
-                className="big-switch"
-                checked={ac.isOn}
-                onChange={(checked) =>
-                    dispatch({ type: "power", isOn: checked })
-                }
-            />
+            <ConfigProvider
+                theme={{
+                    token: {
+                        lineWidthFocus: 0,
+                        colorPrimary: "rgb(255, 0, 0)",
+                    },
+                    components: {
+                        Switch: {
+                            trackHeight: 36,
+                            trackMinWidth: 80,
+                            handleSize: 32,
+                        },
+                    },
+                }}
+            >
+                <Switch
+                    checkedChildren="开启"
+                    unCheckedChildren="关闭"
+                    className="big-switch"
+                    checked={ac.isOn}
+                    onChange={(checked) =>
+                        dispatch({ type: "power", isOn: checked })
+                    }
+                />
+            </ConfigProvider>
         </>
     );
 }
@@ -115,53 +123,13 @@ export default function AcControl() {
     return (
         <>
             <AcProvider>
-                <Flex
-                    vertical
-                    gap="middle"
-                    // align="center"
-                    // justify="space-evenly"
-                    // wrap
-                >
+                <Flex vertical gap="middle">
                     <Temp></Temp>
-                    {/* <div> */}
-                    {/* <Power></Power> */}
-                    {/* </div> */}
                     <div>
-                        <Power2></Power2>
+                        <Power></Power>
                     </div>
                 </Flex>
             </AcProvider>
-            {/* <Temp temp={ac.temp}></Temp>
-                    <Power isOn={ac.isOn}></Power>
-                    <Divider>Solid</Divider>
-                    <button
-                        onClick={() => {
-                            dispatch({
-                                isOn: !ac.isOn,
-                                type: "power",
-                            });
-                        }}
-                    >
-                        ac: swith
-                    </button>
-                    <div>
-                        <h1>ac</h1>
-                        {JSON.stringify(ac, null, 2)}
-                    </div>
-                    <button
-                        onClick={() => {
-                            dispatch({
-                                temp: ac.temp + 1,
-                                type: "power",
-                            });
-                        }}
-                    >
-                        ac: temp
-                    </button>
-                    <div>
-                        <h1>ac</h1>
-                        {JSON.stringify(ac, null, 2)}
-                    </div> */}
         </>
     );
 }

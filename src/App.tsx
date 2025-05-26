@@ -1,21 +1,9 @@
 import { useState } from "react";
 import "./App.css";
-import Card from "./components/Card";
-import { Button, Divider } from "antd";
+import { Divider } from "antd";
 import useSWR, { SWRConfig, useSWRConfig, type SWRConfiguration } from "swr";
 
-import { FaBeer } from "react-icons/fa";
 import AcControl from "./components/AcControl";
-
-function MyComponent() {
-  return (
-    <Button type="primary" icon={<FaBeer />}>
-      喝一杯 🍺
-    </Button>
-  );
-}
-
-
 
 const fetcher = (url: RequestInfo | URL) => {
     console.log("请求 ", url);
@@ -23,7 +11,6 @@ const fetcher = (url: RequestInfo | URL) => {
     return fetch(url).then((res) => res.json());
 };
 function App() {
- 
     const swrConfig: SWRConfiguration = {
         refreshInterval: 3000,
         fetcher: fetcher,
@@ -41,14 +28,9 @@ function App() {
         <>
             <SWRConfig value={swrConfig}>
                 <div>
-                    <AcControl>
-                    </AcControl>
-                      <Divider style={{ borderColor: '#7cb305' }}>Solid</Divider>
+                    <AcControl></AcControl>
+                    <Divider style={{ borderColor: "#7cb305" }}></Divider>
 
-                    <MyComponent></MyComponent>
-                    <Button type="primary">Button</Button>
-                    <Card></Card>
-                
                     <button
                         onClick={() => {
                             setUid((i) => i + 1);
